@@ -3,10 +3,6 @@
 
 #include "piece.h"
 
-//#define DSC (Color) {6, 52, 125, 185}
-//#define LSC WHITE
-//#define SELCOLOR (Color) {250, 185, 0, 185}
-
 void DrawBorder(int boardDimension, Color borderColor) {
     DrawRectangleLines(0, 0, boardDimension, boardDimension, borderColor);
     for (size_t r = 0; r < 8; r += 1) {
@@ -15,16 +11,7 @@ void DrawBorder(int boardDimension, Color borderColor) {
         }
     }
 }
-//void DrawBoardSquares(int squareDimension, Color lightSquaresColor, Color darkSquaresColor) {
-//    for (size_t x = 0; x < 8; x += 2) {
-//        for (size_t y = 0; y < 8; y += 2) {
-//            DrawRectangle(x * squareDimension, y * squareDimension, squareDimension, squareDimension, lightSquaresColor);
-//            DrawRectangle((x + 1) * squareDimension, (y + 1) * squareDimension, squareDimension, squareDimension, lightSquaresColor);
-//            DrawRectangle((x+1) * squareDimension, y * squareDimension, squareDimension, squareDimension, darkSquaresColor);
-//            DrawRectangle(x * squareDimension, (y + 1) * squareDimension, squareDimension, squareDimension, darkSquaresColor);
-//        }
-//    }
-//}
+
 void DrawBoardSquares(Board board, int squareDimension) {
     for (size_t r = 0; r < 8; r += 1) {
         for (size_t c = 0; c < 8; c += 1) {
@@ -159,7 +146,21 @@ int main() {
         Vector2 mouse = GetMousePosition();
         if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
             Vector2 sq = findNearestSquare(mouse, pieceDimension);
-            board[(int)sq.y][(int)sq.x].color = SELCOLOR;
+            Color selColor = SELCOLOR;
+            if (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)) {
+                selColor = SELCOLOR2;
+            } else if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
+                selColor = SELCOLOR3;
+            }
+            board[(int)sq.y][(int)sq.x].color = selColor;
+        }
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            for (size_t r = 0; r < 8; r++) {
+                for (size_t c = 0; c < 8; c++) {
+                    if (board[r][c].type == 'L') board[r][c].color = LSC;
+                    if (board[r][c].type == 'D') board[r][c].color = DSC;
+                }
+            }
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             if (!isPieceGrabbed) {
@@ -178,7 +179,9 @@ int main() {
             if (isPieceGrabbed && pieceGrabbed->type != 0) {
                 Vector2 pieceDroppedSq = findNearestSquare(mouse, pieceDimension);
                 board[(int)pieceDroppedSq.y][(int)pieceDroppedSq.x].piece = (ChessPiece) {pieceDroppedSq.x, pieceDroppedSq.y, pieceGrabbed->type};
-                board[(int)pieceGrabbedSq.y][(int)pieceGrabbedSq.x].piece = (ChessPiece) {0};
+                if ((int)pieceDroppedSq.y != (int)pieceGrabbedSq.y || (int)pieceDroppedSq.x != (int)pieceGrabbedSq.x) {
+                    board[(int)pieceGrabbedSq.y][(int)pieceGrabbedSq.x].piece = (ChessPiece) {0};
+                }
             }
             isPieceGrabbed = false;
             pieceGrabbedSq = (Vector2) {0};
@@ -188,8 +191,8 @@ int main() {
         BeginDrawing();
             ClearBackground(LIGHTGRAY);
             DrawBoardSquares(board, pieceDimension);
-            DrawBoardPieces(board, texture, pieceDimension);
             DrawBorder(boardDimension, BLACK);
+            DrawBoardPieces(board, texture, pieceDimension);
 
 
             DrawText("scb - simple chess board", 190, 200, 20, BLACK);

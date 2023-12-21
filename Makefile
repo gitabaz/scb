@@ -7,8 +7,8 @@ LIBS = -lraylib -lm
 
 .PHONY: clean
 
-scb: src/scb.c
-	$(CC) $(CFLAGS) $^ -o $@ -I$(INC_DIR) -L$(LIB_DIR) $(LIBS)
+scb: src/scb.c src/piece.h
+	$(CC) $(CFLAGS) $< -o $@ -I$(INC_DIR) -L$(LIB_DIR) $(LIBS)
 
 clean:
 	$(RM) scb
