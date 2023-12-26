@@ -180,3 +180,8 @@ void ArrowListAdd(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare) 
         arrowList->len += 1;
     }
 }
+
+void ArrowListFree(ArrowList *arrowList) {
+    free(arrowList->startSquares);
+    free(arrowList->endSquares);
+}

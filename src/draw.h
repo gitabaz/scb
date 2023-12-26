@@ -18,3 +18,4 @@ void DrawArrow(Vector2 startSquare, Vector2 endSquare, int squareDimension, Colo
 void DrawArrows(ArrowList *arrowList, int squareDimension);
 void ArrowListInit(ArrowList *arrowList);
 void ArrowListAdd(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare);
+void ArrowListFree(ArrowList *arrowList);

@@ -114,6 +114,7 @@ int main() {
         EndDrawing();
     }
 
+    ArrowListFree(&arrowList);
     CloseWindow();
 
     return 0;
