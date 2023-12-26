@@ -29,6 +29,12 @@ int main() {
     bool isPieceGrabbed = false;
     Vector2 pieceGrabbedSq;
     ChessPiece *pieceGrabbed;
+    bool isArrowStarted = false;
+    Vector2 arrowStartSq;
+
+    ArrowList arrowList = {0};
+    ArrowListInit(&arrowList);
+
     while (!WindowShouldClose()) {
         if (IsWindowResized()) {
             UnloadImage(img);
@@ -46,8 +52,15 @@ int main() {
         if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
             DrawSelectSquare(board, mouse, pieceDimension);
         }
+        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+            if (!isArrowStarted) {
+                isArrowStarted = true;
+                arrowStartSq = findNearestSquare(mouse, pieceDimension);
+            }
+        }
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             ClearSelectSquare(board);
+            arrowList.len = 0;
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             if (!isPieceGrabbed) {
@@ -61,6 +74,20 @@ int main() {
             }
             //printf("x: %f, y: %f\n", mouse.x, mouse.y);
             //printf("sqx: %f, sqy: %f\n", pieceGrabbedSq.x, pieceGrabbedSq.y);
+        }
+        if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
+            if (isArrowStarted) {
+                Vector2 arrowEndSq = findNearestSquare(mouse, pieceDimension);
+                if ((int)arrowStartSq.y != (int)arrowEndSq.y || (int)arrowStartSq.x != (int)arrowEndSq.x) {
+                    ArrowListAdd(&arrowList, arrowStartSq, arrowEndSq);
+                    int r = (int)arrowStartSq.y;
+                    int c = (int)arrowStartSq.x;
+                    if (board[r][c].type == 'L') board[r][c].color = LSC;
+                    if (board[r][c].type == 'D') board[r][c].color = DSC;
+                //printf("sx: %f, sy: %f\nex: %f, ey: %f\n", arrowStartSq.x, arrowStartSq.y, arrowEndSq.x, arrowEndSq.y);
+                }
+            }
+            isArrowStarted = false;
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
             if (isPieceGrabbed && pieceGrabbed->type != 0) {
@@ -81,6 +108,7 @@ int main() {
             DrawBorder(boardDimension, BLACK);
             DrawBoardPieces(board, texture, pieceDimension);
 
+            DrawArrows(&arrowList, pieceDimension);
 
             DrawText("scb - simple chess board", 190, 200, 20, BLACK);
         EndDrawing();

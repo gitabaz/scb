@@ -1,4 +1,7 @@
 #include "draw.h"
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void DrawBorder(int boardDimension, Color borderColor) {
     DrawRectangleLines(0, 0, boardDimension, boardDimension, borderColor);
@@ -112,5 +115,68 @@ void ClearSelectSquare(Board board) {
             if (board[r][c].type == 'L') board[r][c].color = LSC;
             if (board[r][c].type == 'D') board[r][c].color = DSC;
         }
+    }
+}
+
+
+void DrawArrow(Vector2 startSquare, Vector2 endSquare, int squareDimension, Color color) {
+    float length = sqrt(pow(startSquare.x - endSquare.x, 2) + pow(startSquare.y - endSquare.y, 2));
+    float width = 0.25;
+    float angle = atan2(endSquare.y - startSquare.y, endSquare.x - startSquare.x);
+
+    Rectangle rec = (Rectangle) {
+        squareDimension * (startSquare.x + 0.5),
+        squareDimension * (startSquare.y + 0.5),
+        squareDimension * length,
+        squareDimension * width
+    };
+    DrawRectanglePro(rec, (Vector2) {0, rec.height * 0.5}, angle * RAD2DEG, color);
+
+    float ca = cos(angle);
+    float sa = sin(angle);
+    float p1x, p1y, p2x, p2y, p3x, p3y;
+    p1x = squareDimension * 0.5;
+    p1y = squareDimension * 0.25;
+    p2x = squareDimension * 0.5;
+    p2y = squareDimension * 0.75;
+    p3x = squareDimension * 0.75;
+    p3y = squareDimension * 0.5;
+
+    DrawTriangle(
+        (Vector2) {
+            ca * (p1x - 0.5 * squareDimension) - sa * (p1y - 0.5 * squareDimension) + (endSquare.x + 0.5) * squareDimension,
+            sa * (p1x - 0.5 * squareDimension) + ca * (p1y - 0.5 * squareDimension) + (endSquare.y + 0.5) * squareDimension
+        },
+        (Vector2) {
+            ca * (p2x - 0.5 * squareDimension) - sa * (p2y - 0.5 * squareDimension) + (endSquare.x + 0.5) * squareDimension,
+            sa * (p2x - 0.5 * squareDimension) + ca * (p2y - 0.5 * squareDimension) + (endSquare.y + 0.5) * squareDimension
+        },
+        (Vector2) {
+            ca * (p3x - 0.5 * squareDimension) - sa * (p3y - 0.5 * squareDimension) + (endSquare.x + 0.5) * squareDimension,
+            sa * (p3x - 0.5 * squareDimension) + ca * (p3y - 0.5 * squareDimension) + (endSquare.y + 0.5) * squareDimension
+        },
+        color
+    );
+}
+
+void DrawArrows(ArrowList *arrowList, int squareDimension) {
+    for (size_t i = 0; i < arrowList->len; i++) {
+        DrawArrow(arrowList->startSquares[i], arrowList->endSquares[i], squareDimension, SELCOLOR);
+    }
+}
+
+
+void ArrowListInit(ArrowList *arrowList) {
+    arrowList->startSquares = malloc(10 * sizeof(arrowList->startSquares));
+    arrowList->endSquares = malloc(10 * sizeof(arrowList->endSquares));
+    arrowList->len = 0;
+    arrowList->capacity = 10;
+}
+
+void ArrowListAdd(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare) {
+    if (arrowList->len < arrowList->capacity) {
+        arrowList->startSquares[arrowList->len] = startSquare;
+        arrowList->endSquares[arrowList->len] = endSquare;
+        arrowList->len += 1;
     }
 }
