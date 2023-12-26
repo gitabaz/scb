@@ -94,3 +94,23 @@ void DrawBoardPieces(Board board, Texture2D texture, int pieceDimension) {
     }
 
 }
+
+void DrawSelectSquare(Board board, Vector2 mouse, int squareDimension) {
+    Vector2 sq = findNearestSquare(mouse, squareDimension);
+    Color selColor = SELCOLOR;
+    if (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)) {
+        selColor = SELCOLOR2;
+    } else if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
+        selColor = SELCOLOR3;
+    }
+    board[(int)sq.y][(int)sq.x].color = selColor;
+}
+
+void ClearSelectSquare(Board board) {
+    for (size_t r = 0; r < 8; r++) {
+        for (size_t c = 0; c < 8; c++) {
+            if (board[r][c].type == 'L') board[r][c].color = LSC;
+            if (board[r][c].type == 'D') board[r][c].color = DSC;
+        }
+    }
+}

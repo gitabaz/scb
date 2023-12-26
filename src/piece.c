@@ -45,3 +45,10 @@ void initBoardPieces(Board board) {
     board[6][6].piece = (ChessPiece){6, 6, 'P'};
     board[6][7].piece = (ChessPiece){7, 6, 'P'};
 }
+
+Vector2 findNearestSquare(Vector2 mouse, int squareDimension) {
+    int x = mouse.x / squareDimension;
+    int y = mouse.y / squareDimension;
+
+    return (Vector2) {x, y};
+}

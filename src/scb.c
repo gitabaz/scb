@@ -4,15 +4,6 @@
 #include "piece.h"
 #include "draw.h"
 
-
-
-Vector2 findNearestSquare(Vector2 mouse, int squareDimension) {
-    int x = mouse.x / squareDimension;
-    int y = mouse.y / squareDimension;
-
-    return (Vector2) {x, y};
-}
-
 int main() {
 
     const int screenWidth = 800;
@@ -53,22 +44,10 @@ int main() {
 
         Vector2 mouse = GetMousePosition();
         if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-            Vector2 sq = findNearestSquare(mouse, pieceDimension);
-            Color selColor = SELCOLOR;
-            if (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)) {
-                selColor = SELCOLOR2;
-            } else if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
-                selColor = SELCOLOR3;
-            }
-            board[(int)sq.y][(int)sq.x].color = selColor;
+            DrawSelectSquare(board, mouse, pieceDimension);
         }
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            for (size_t r = 0; r < 8; r++) {
-                for (size_t c = 0; c < 8; c++) {
-                    if (board[r][c].type == 'L') board[r][c].color = LSC;
-                    if (board[r][c].type == 'D') board[r][c].color = DSC;
-                }
-            }
+            ClearSelectSquare(board);
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             if (!isPieceGrabbed) {
