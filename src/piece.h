@@ -27,3 +27,4 @@ typedef ChessSquare Board[8][8];
 void initBoardSquares(Board board);
 void initBoardPieces(Board board);
 Vector2 findNearestSquare(Vector2 mouse, int squareDimension);
+bool inBoardBounds(int x, int y);

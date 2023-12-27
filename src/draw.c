@@ -100,6 +100,9 @@ void DrawBoardPieces(Board board, Texture2D texture, int pieceDimension) {
 
 void DrawSelectSquare(Board board, Vector2 mouse, int squareDimension) {
     Vector2 sq = findNearestSquare(mouse, squareDimension);
+
+    if (!inBoardBounds((int) sq.x, (int) sq.y)) return;
+
     Color selColor = SELCOLOR;
     if (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)) {
         selColor = SELCOLOR2;
@@ -161,7 +164,7 @@ void DrawArrow(Vector2 startSquare, Vector2 endSquare, int squareDimension, Colo
 
 void DrawArrows(ArrowList *arrowList, int squareDimension) {
     for (size_t i = 0; i < arrowList->len; i++) {
-        DrawArrow(arrowList->startSquares[i], arrowList->endSquares[i], squareDimension, SELCOLOR);
+        DrawArrow(arrowList->startSquares[i], arrowList->endSquares[i], squareDimension, arrowList->colors[i]);
     }
 }
 
@@ -169,14 +172,16 @@ void DrawArrows(ArrowList *arrowList, int squareDimension) {
 void ArrowListInit(ArrowList *arrowList) {
     arrowList->startSquares = malloc(10 * sizeof(arrowList->startSquares));
     arrowList->endSquares = malloc(10 * sizeof(arrowList->endSquares));
+    arrowList->colors = malloc(10 * sizeof(arrowList->colors));
     arrowList->len = 0;
     arrowList->capacity = 10;
 }
 
-void ArrowListAdd(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare) {
+void ArrowListAdd(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare, Color color) {
     if (arrowList->len < arrowList->capacity) {
         arrowList->startSquares[arrowList->len] = startSquare;
         arrowList->endSquares[arrowList->len] = endSquare;
+        arrowList->colors[arrowList->len] = color;
         arrowList->len += 1;
     }
 }
@@ -184,4 +189,5 @@ void ArrowListAdd(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare) 
 void ArrowListFree(ArrowList *arrowList) {
     free(arrowList->startSquares);
     free(arrowList->endSquares);
+    free(arrowList->colors);
 }

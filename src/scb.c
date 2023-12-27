@@ -54,8 +54,8 @@ int main() {
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
             if (!isArrowStarted) {
-                isArrowStarted = true;
                 arrowStartSq = findNearestSquare(mouse, pieceDimension);
+                isArrowStarted = inBoardBounds((int) arrowStartSq.x, (int) arrowStartSq.y);
             }
         }
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -64,11 +64,12 @@ int main() {
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             if (!isPieceGrabbed) {
-                isPieceGrabbed = true;
                 pieceGrabbedSq = findNearestSquare(mouse, pieceDimension);
-                pieceGrabbed = &board[(int)pieceGrabbedSq.y][(int)pieceGrabbedSq.x].piece;
-            }
-            if (pieceGrabbed->type != 0) {
+                if (inBoardBounds((int) pieceGrabbedSq.x, (int) pieceGrabbedSq.y)) {
+                    isPieceGrabbed = true;
+                    pieceGrabbed = &board[(int) pieceGrabbedSq.y][(int) pieceGrabbedSq.x].piece;
+                }
+            } else if (pieceGrabbed->type != 0) {
                 pieceGrabbed->x = mouse.x / pieceDimension - 1.0 / 2.0;
                 pieceGrabbed->y = mouse.y / pieceDimension - 1.0 / 2.0;
             }
@@ -78,13 +79,20 @@ int main() {
         if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
             if (isArrowStarted) {
                 Vector2 arrowEndSq = findNearestSquare(mouse, pieceDimension);
-                if ((int)arrowStartSq.y != (int)arrowEndSq.y || (int)arrowStartSq.x != (int)arrowEndSq.x) {
-                    ArrowListAdd(&arrowList, arrowStartSq, arrowEndSq);
-                    int r = (int)arrowStartSq.y;
-                    int c = (int)arrowStartSq.x;
+                if ((int) arrowStartSq.y != (int) arrowEndSq.y || (int) arrowStartSq.x != (int) arrowEndSq.x) {
+                    Color selColor = SELCOLOR;
+                    if (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)) {
+                        selColor = SELCOLOR2;
+                    } else if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
+                        selColor = SELCOLOR3;
+                    }
+                    if (inBoardBounds((int) arrowEndSq.x, (int) arrowEndSq.y)) {
+                        ArrowListAdd(&arrowList, arrowStartSq, arrowEndSq, selColor);
+                    }
+                    int r = (int) arrowStartSq.y;
+                    int c = (int) arrowStartSq.x;
                     if (board[r][c].type == 'L') board[r][c].color = LSC;
                     if (board[r][c].type == 'D') board[r][c].color = DSC;
-                //printf("sx: %f, sy: %f\nex: %f, ey: %f\n", arrowStartSq.x, arrowStartSq.y, arrowEndSq.x, arrowEndSq.y);
                 }
             }
             isArrowStarted = false;
@@ -92,9 +100,13 @@ int main() {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
             if (isPieceGrabbed && pieceGrabbed->type != 0) {
                 Vector2 pieceDroppedSq = findNearestSquare(mouse, pieceDimension);
-                board[(int)pieceDroppedSq.y][(int)pieceDroppedSq.x].piece = (ChessPiece) {pieceDroppedSq.x, pieceDroppedSq.y, pieceGrabbed->type};
-                if ((int)pieceDroppedSq.y != (int)pieceGrabbedSq.y || (int)pieceDroppedSq.x != (int)pieceGrabbedSq.x) {
-                    board[(int)pieceGrabbedSq.y][(int)pieceGrabbedSq.x].piece = (ChessPiece) {0};
+                if (inBoardBounds((int) pieceDroppedSq.x, (int) pieceDroppedSq.y)) {
+                    board[(int) pieceDroppedSq.y][(int) pieceDroppedSq.x].piece = (ChessPiece) {pieceDroppedSq.x, pieceDroppedSq.y, pieceGrabbed->type};
+                    if ((int) pieceDroppedSq.y != (int) pieceGrabbedSq.y || (int) pieceDroppedSq.x != (int) pieceGrabbedSq.x) {
+                        board[(int) pieceGrabbedSq.y][(int) pieceGrabbedSq.x].piece = (ChessPiece) {0};
+                    }
+                } else {
+                    board[(int) pieceGrabbedSq.y][(int) pieceGrabbedSq.x].piece = (ChessPiece) {pieceGrabbedSq.x, pieceGrabbedSq.y, pieceGrabbed->type};
                 }
             }
             isPieceGrabbed = false;

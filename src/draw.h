@@ -5,6 +5,7 @@
 typedef struct ArrowList {
     Vector2 *startSquares;
     Vector2 *endSquares;
+    Color *colors;
     size_t len;
     size_t capacity;
 } ArrowList;
@@ -17,5 +18,5 @@ void ClearSelectSquare(Board board);
 void DrawArrow(Vector2 startSquare, Vector2 endSquare, int squareDimension, Color color);
 void DrawArrows(ArrowList *arrowList, int squareDimension);
 void ArrowListInit(ArrowList *arrowList);
-void ArrowListAdd(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare);
+void ArrowListAdd(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare, Color color);
 void ArrowListFree(ArrowList *arrowList);

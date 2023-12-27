@@ -52,3 +52,13 @@ Vector2 findNearestSquare(Vector2 mouse, int squareDimension) {
 
     return (Vector2) {x, y};
 }
+
+bool inBoardBounds(int x, int y) {
+    if ((x < 8) && (x >= 0)) {
+        if ((y < 8) && (y >= 0)) {
+            return true;
+        }
+    }
+
+    return false;
+}
