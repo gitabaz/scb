@@ -2,6 +2,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "raymath.h"
 
 void DrawBorder(int boardDimension, Color borderColor) {
     DrawRectangleLines(0, 0, boardDimension, boardDimension, borderColor);
@@ -186,12 +189,48 @@ void ArrowListInit(ArrowList *arrowList) {
 }
 
 void ArrowListAdd(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare, Color color) {
-    if (arrowList->len < arrowList->capacity) {
-        arrowList->startSquares[arrowList->len] = startSquare;
-        arrowList->endSquares[arrowList->len] = endSquare;
-        arrowList->colors[arrowList->len] = color;
-        arrowList->len += 1;
+    int idx = ArrowListArrowInList(arrowList, startSquare, endSquare, color);
+    if (idx >= 0) {
+        ArrowListRemove(arrowList, idx);
+    } else {
+        if (arrowList->len < arrowList->capacity) {
+            arrowList->startSquares[arrowList->len] = startSquare;
+            arrowList->endSquares[arrowList->len] = endSquare;
+            arrowList->colors[arrowList->len] = color;
+            arrowList->len += 1;
+        }
     }
+}
+
+void ArrowListRemove(ArrowList *arrowList, int i) {
+    int count = arrowList->len - i - 1;
+    memmove(
+            &arrowList->startSquares[i],
+            &arrowList->startSquares[i + 1],
+            count * sizeof(arrowList->startSquares)
+        );
+    memmove(
+            &arrowList->endSquares[i],
+            &arrowList->endSquares[i + 1],
+            count * sizeof(arrowList->endSquares)
+        );
+    memmove(
+            &arrowList->colors[i],
+            &arrowList->colors[i + 1],
+            count * sizeof(arrowList->colors)
+        );
+    arrowList->len -= 1;
+}
+
+int ArrowListArrowInList(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare, Color color) {
+    for (size_t i = 0; i < arrowList->len; i++) {
+        if (
+                Vector2Equals(arrowList->startSquares[i], startSquare) &&
+                Vector2Equals(arrowList->endSquares[i], endSquare) &&
+                (ColorToInt(arrowList->colors[i]) == ColorToInt(color))
+           ) return i;
+    }
+    return -1;
 }
 
 void ArrowListFree(ArrowList *arrowList) {

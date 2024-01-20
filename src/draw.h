@@ -19,4 +19,6 @@ void DrawArrow(Vector2 startSquare, Vector2 endSquare, int squareDimension, Colo
 void DrawArrows(ArrowList *arrowList, int squareDimension);
 void ArrowListInit(ArrowList *arrowList);
 void ArrowListAdd(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare, Color color);
+void ArrowListRemove(ArrowList *arrowList, int i);
+int ArrowListArrowInList(ArrowList *arrowList, Vector2 startSquare, Vector2 endSquare, Color color);
 void ArrowListFree(ArrowList *arrowList);
