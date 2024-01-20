@@ -102,11 +102,11 @@ void DrawBoardPieces(Board board, Texture2D texture, int pieceDimension) {
 }
 
 void DrawSelectSquare(Board board, Vector2 mouse, int squareDimension) {
-    Vector2 sq = findNearestSquare(mouse, squareDimension);
+    Vector2 sq = FindNearestSquare(mouse, squareDimension);
 
     int c = (int) sq.x;
     int r = (int) sq.y;
-    if (!inBoardBounds(c, r)) return;
+    if (!InBoardBounds(c, r)) return;
 
     Color selColor = SELCOLOR;
     if (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)) {
@@ -135,7 +135,7 @@ void ClearSelectSquare(Board board) {
 
 void DrawArrow(Vector2 startSquare, Vector2 endSquare, int squareDimension, Color color) {
     float length = sqrt(pow(startSquare.x - endSquare.x, 2) + pow(startSquare.y - endSquare.y, 2));
-    float width = 0.25;
+    float width = 0.15;
     float angle = atan2(endSquare.y - startSquare.y, endSquare.x - startSquare.x);
 
     Rectangle rec = (Rectangle) {
@@ -181,9 +181,9 @@ void DrawArrows(ArrowList *arrowList, int squareDimension) {
 
 
 void ArrowListInit(ArrowList *arrowList) {
-    arrowList->startSquares = malloc(10 * sizeof(arrowList->startSquares));
-    arrowList->endSquares = malloc(10 * sizeof(arrowList->endSquares));
-    arrowList->colors = malloc(10 * sizeof(arrowList->colors));
+    arrowList->startSquares = malloc(10 * sizeof(*arrowList->startSquares));
+    arrowList->endSquares = malloc(10 * sizeof(*arrowList->endSquares));
+    arrowList->colors = malloc(10 * sizeof(*arrowList->colors));
     arrowList->len = 0;
     arrowList->capacity = 10;
 }
@@ -207,17 +207,17 @@ void ArrowListRemove(ArrowList *arrowList, int i) {
     memmove(
             &arrowList->startSquares[i],
             &arrowList->startSquares[i + 1],
-            count * sizeof(arrowList->startSquares)
+            count * sizeof(*arrowList->startSquares)
         );
     memmove(
             &arrowList->endSquares[i],
             &arrowList->endSquares[i + 1],
-            count * sizeof(arrowList->endSquares)
+            count * sizeof(*arrowList->endSquares)
         );
     memmove(
             &arrowList->colors[i],
             &arrowList->colors[i + 1],
-            count * sizeof(arrowList->colors)
+            count * sizeof(*arrowList->colors)
         );
     arrowList->len -= 1;
 }

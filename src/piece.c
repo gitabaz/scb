@@ -1,6 +1,9 @@
+#include <string.h>
+#include <ctype.h>
+
 #include "piece.h"
 
-void initBoardSquares(Board board) {
+void InitBoardSquares(Board board) {
     for (size_t r = 0; r < 8; r += 2) {
         for (size_t c = 0; c < 8; c += 2) {
             board[r][c] = (ChessSquare) {c, r, (ChessPiece){0}, LSC, 'L'};
@@ -11,7 +14,15 @@ void initBoardSquares(Board board) {
     }
 }
 
-void initBoardPieces(Board board) {
+void ClearBoardPieces(Board board) {
+    for (size_t r = 0; r < 8; r++) {
+        for (size_t c = 0; c < 8; c++) {
+            board[r][c].piece = (ChessPiece){c, r, '\0'};
+        }
+    }
+}
+
+void InitBoardPieces(Board board) {
     board[0][0].piece = (ChessPiece){0, 0, 'r'};
     board[0][1].piece = (ChessPiece){1, 0, 'n'};
     board[0][2].piece = (ChessPiece){2, 0, 'b'};
@@ -46,14 +57,14 @@ void initBoardPieces(Board board) {
     board[6][7].piece = (ChessPiece){7, 6, 'P'};
 }
 
-Vector2 findNearestSquare(Vector2 mouse, int squareDimension) {
+Vector2 FindNearestSquare(Vector2 mouse, int squareDimension) {
     int x = mouse.x / squareDimension;
     int y = mouse.y / squareDimension;
 
     return (Vector2) {x, y};
 }
 
-bool inBoardBounds(int x, int y) {
+bool InBoardBounds(int x, int y) {
     if ((x < 8) && (x >= 0)) {
         if ((y < 8) && (y >= 0)) {
             return true;
@@ -61,4 +72,24 @@ bool inBoardBounds(int x, int y) {
     }
 
     return false;
+}
+
+void BoardFromPosition(Board board, Position pos) {
+    ClearBoardPieces(board);
+    size_t r = 0;
+    size_t c = 0;
+    char ch;
+    for (size_t i = 0; i < strlen(pos.piecePlacement); i++) {
+        ch = pos.piecePlacement[i];
+        if (ch == '/') {
+            r += 1;
+            c = 0;
+        } else if (isdigit(ch)) {
+            c += (ch - '0');
+        } else {
+            board[r][c].piece = (ChessPiece){c, r, ch};
+            c += 1;
+        }
+    }
+
 }

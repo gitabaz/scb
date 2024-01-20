@@ -3,17 +3,29 @@
 
 #include "piece.h"
 #include "draw.h"
+#include "pgn.h"
 
 int main() {
     const int screenWidth = 800;
     const int screenHeight = 600;
 
+    //const char *pgn = "rnbqkb1r/ppp1pppp/5n2/8/2pP4/4PN2/PP3PPP/RNBQKB1R b KQkq - 0 4";
+    const char *pgn = "rn1q1rk1/ppp1bppp/4pn2/7b/2BP4/2N1PN1P/PP3PP1/R1BQ1RK1 w - - 3 9";
+    Position pos = PositionFromFEN(pgn);
+    printf("pos: %s\n", pos.piecePlacement);
+    printf("activeColor: %c\n", pos.activeColor);
+    printf("castlingRights: %s\n", pos.castlingRights);
+    printf("enPassant: %s\n", pos.enPassant);
+    printf("halfmove: %zu\n", pos.halfMoveClock);
+    printf("fullmove: %zu\n", pos.fullMoveCount);
+
     InitWindow(screenWidth, screenHeight, "scb");
     SetTargetFPS(60);
 
     Board board = {0};
-    initBoardSquares(board);
-    initBoardPieces(board);
+    InitBoardSquares(board);
+    InitBoardPieces(board);
+    BoardFromPosition(board, pos);
 
     const float scaleFactor = 0.2;
     int pieceTextureHeight = screenHeight * scaleFactor;
@@ -50,8 +62,8 @@ int main() {
         Vector2 mouse = GetMousePosition();
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
             if (!isArrowStarted) {
-                arrowStartSq = findNearestSquare(mouse, pieceDimension);
-                isArrowStarted = inBoardBounds((int) arrowStartSq.x, (int) arrowStartSq.y);
+                arrowStartSq = FindNearestSquare(mouse, pieceDimension);
+                isArrowStarted = InBoardBounds((int) arrowStartSq.x, (int) arrowStartSq.y);
             }
         }
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -60,8 +72,8 @@ int main() {
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             if (!isPieceGrabbed) {
-                pieceGrabbedSq = findNearestSquare(mouse, pieceDimension);
-                if (inBoardBounds((int) pieceGrabbedSq.x, (int) pieceGrabbedSq.y)) {
+                pieceGrabbedSq = FindNearestSquare(mouse, pieceDimension);
+                if (InBoardBounds((int) pieceGrabbedSq.x, (int) pieceGrabbedSq.y)) {
                     isPieceGrabbed = true;
                     pieceGrabbed = &board[(int) pieceGrabbedSq.y][(int) pieceGrabbedSq.x].piece;
                 }
@@ -74,7 +86,7 @@ int main() {
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
             if (isArrowStarted) {
-                Vector2 arrowEndSq = findNearestSquare(mouse, pieceDimension);
+                Vector2 arrowEndSq = FindNearestSquare(mouse, pieceDimension);
                 if ((int) arrowStartSq.y != (int) arrowEndSq.y || (int) arrowStartSq.x != (int) arrowEndSq.x) {
                     Color selColor = SELCOLOR;
                     if (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)) {
@@ -82,7 +94,7 @@ int main() {
                     } else if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
                         selColor = SELCOLOR3;
                     }
-                    if (inBoardBounds((int) arrowEndSq.x, (int) arrowEndSq.y)) {
+                    if (InBoardBounds((int) arrowEndSq.x, (int) arrowEndSq.y)) {
                         ArrowListAdd(&arrowList, arrowStartSq, arrowEndSq, selColor);
                     }
                 } else {
@@ -93,8 +105,8 @@ int main() {
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
             if (isPieceGrabbed && pieceGrabbed->type != 0) {
-                Vector2 pieceDroppedSq = findNearestSquare(mouse, pieceDimension);
-                if (inBoardBounds((int) pieceDroppedSq.x, (int) pieceDroppedSq.y)) {
+                Vector2 pieceDroppedSq = FindNearestSquare(mouse, pieceDimension);
+                if (InBoardBounds((int) pieceDroppedSq.x, (int) pieceDroppedSq.y)) {
                     board[(int) pieceDroppedSq.y][(int) pieceDroppedSq.x].piece = (ChessPiece) {pieceDroppedSq.x, pieceDroppedSq.y, pieceGrabbed->type};
                     if ((int) pieceDroppedSq.y != (int) pieceGrabbedSq.y || (int) pieceDroppedSq.x != (int) pieceGrabbedSq.x) {
                         board[(int) pieceGrabbedSq.y][(int) pieceGrabbedSq.x].piece = (ChessPiece) {0};
@@ -121,6 +133,7 @@ int main() {
     }
 
     ArrowListFree(&arrowList);
+    PositionFree(&pos);
     CloseWindow();
 
     return 0;

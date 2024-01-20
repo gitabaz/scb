@@ -2,9 +2,11 @@
 #include "raylib.h"
 #include <stddef.h>
 
+#include "pgn.h"
+
 #define DSC (Color) {6, 52, 125, 185}
 #define LSC WHITE
-#define SELCOLOR (Color) {100, 250, 100, 185}
+#define SELCOLOR (Color) {100, 250, 60, 185}
 #define SELCOLOR2 (Color) {235, 65, 50, 185}
 #define SELCOLOR3 (Color) {250, 185, 0, 185}
 
@@ -24,7 +26,9 @@ typedef struct ChessSquare {
 
 typedef ChessSquare Board[8][8];
 
-void initBoardSquares(Board board);
-void initBoardPieces(Board board);
-Vector2 findNearestSquare(Vector2 mouse, int squareDimension);
-bool inBoardBounds(int x, int y);
+void InitBoardSquares(Board board);
+void InitBoardPieces(Board board);
+Vector2 FindNearestSquare(Vector2 mouse, int squareDimension);
+bool InBoardBounds(int x, int y);
+
+void BoardFromPosition(Board board, Position pos);
