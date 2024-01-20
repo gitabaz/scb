@@ -101,7 +101,9 @@ void DrawBoardPieces(Board board, Texture2D texture, int pieceDimension) {
 void DrawSelectSquare(Board board, Vector2 mouse, int squareDimension) {
     Vector2 sq = findNearestSquare(mouse, squareDimension);
 
-    if (!inBoardBounds((int) sq.x, (int) sq.y)) return;
+    int c = (int) sq.x;
+    int r = (int) sq.y;
+    if (!inBoardBounds(c, r)) return;
 
     Color selColor = SELCOLOR;
     if (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)) {
@@ -109,7 +111,13 @@ void DrawSelectSquare(Board board, Vector2 mouse, int squareDimension) {
     } else if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
         selColor = SELCOLOR3;
     }
-    board[(int)sq.y][(int)sq.x].color = selColor;
+
+    if (ColorToInt(board[r][c].color) == ColorToInt(selColor)) {
+        if (board[r][c].type == 'L') board[r][c].color = LSC;
+        if (board[r][c].type == 'D') board[r][c].color = DSC;
+    } else {
+        board[r][c].color = selColor;
+    }
 }
 
 void ClearSelectSquare(Board board) {

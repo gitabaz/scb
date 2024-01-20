@@ -5,7 +5,6 @@
 #include "draw.h"
 
 int main() {
-
     const int screenWidth = 800;
     const int screenHeight = 600;
 
@@ -24,7 +23,7 @@ int main() {
     Texture2D texture = LoadTextureFromImage(img);
 
     int boardDimension = 8 * pieceDimension;
-    printf("pieceDimension: %d, boardDimension: %d\n", pieceDimension, boardDimension);
+    //printf("pieceDimension: %d, boardDimension: %d\n", pieceDimension, boardDimension);
     
     bool isPieceGrabbed = false;
     Vector2 pieceGrabbedSq;
@@ -41,7 +40,7 @@ int main() {
             UnloadTexture(texture);
             pieceTextureHeight = scaleFactor * GetScreenHeight();
             int pieceTextureWidth = 3.0 * pieceTextureHeight;
-            printf("RESIZE: width: %d, height: %d\n", pieceTextureWidth, pieceTextureHeight);
+            //printf("RESIZE: width: %d, height: %d\n", pieceTextureWidth, pieceTextureHeight);
             img = LoadImageSvg("assets/chess_pieces.svg", pieceTextureWidth, pieceTextureHeight);
             texture = LoadTextureFromImage(img);
             pieceDimension = pieceTextureWidth / 6.0;
@@ -49,9 +48,6 @@ int main() {
         }
 
         Vector2 mouse = GetMousePosition();
-        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-            DrawSelectSquare(board, mouse, pieceDimension);
-        }
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
             if (!isArrowStarted) {
                 arrowStartSq = findNearestSquare(mouse, pieceDimension);
@@ -89,10 +85,8 @@ int main() {
                     if (inBoardBounds((int) arrowEndSq.x, (int) arrowEndSq.y)) {
                         ArrowListAdd(&arrowList, arrowStartSq, arrowEndSq, selColor);
                     }
-                    int r = (int) arrowStartSq.y;
-                    int c = (int) arrowStartSq.x;
-                    if (board[r][c].type == 'L') board[r][c].color = LSC;
-                    if (board[r][c].type == 'D') board[r][c].color = DSC;
+                } else {
+                    DrawSelectSquare(board, mouse, pieceDimension);
                 }
             }
             isArrowStarted = false;
